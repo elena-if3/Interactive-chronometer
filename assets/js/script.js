@@ -16,17 +16,22 @@ let laps = [];
 // Timeout ID per i messaggi temporanei
 let feedbackTimeout = null;
 
-// Selezioniamo gli elementi dal DOM (display e lista dei laps)
+// Selezioniamo gli elementi dal DOM
 const display = document.getElementById("display");
+const startButton = document.getElementById("start");
+const stopButton = document.getElementById("stop");
+const resetButton = document.getElementById("reset");
+const lapButton = document.getElementById("lap");
 const lapsList = document.getElementById("laps");
 
 // Funzione per formattare il tempo da millisecondi a stringa leggibile
 function formatTime(ms) {
     const time = new Date(ms); // Convertiamo i millisecondi in oggetto Date
+    const hours = String(time.getUTCHours()).padStart(2, "0");
     const minutes = String(time.getUTCMinutes()).padStart(2, "0");
     const seconds = String(time.getUTCSeconds()).padStart(2, "0");
     const milliseconds = String(time.getUTCMilliseconds()).padStart(3, "0");
-    return `${minutes}:${seconds}.${milliseconds}`; // Return: la stringa formattata
+    return `${hours}:${minutes}:${seconds}.${milliseconds}`; // Return: la stringa formattata
 }
 
 // Funzione per aggiornare il display visivo del tempo
@@ -35,7 +40,7 @@ function updateDisplay() {
 }
 
 // EVENTO: Start (avvia il cronometro)
-document.getElementById("start").addEventListener("click", () => {
+startButton.addEventListener("click", () => {
     if (isRunning) return; // Se è già in esecuzione, non fare nulla
 
     isRunning = true; // Imposta il flag su "in esecuzione"
@@ -51,7 +56,7 @@ document.getElementById("start").addEventListener("click", () => {
 });
 
 // EVENTO: Stop (mette in pausa il cronometro)
-document.getElementById("stop").addEventListener("click", () => {
+stopButton.addEventListener("click", () => {
     if (!isRunning) return; // Se non è in esecuzione, non fare nulla
 
     clearInterval(timerInterval); // Ferma l'intervallo attivo
@@ -61,7 +66,7 @@ document.getElementById("stop").addEventListener("click", () => {
 });
 
 // EVENTO: Reset (azzera tutto)
-document.getElementById("reset").addEventListener("click", () => {
+resetButton.addEventListener("click", () => {
     clearInterval(timerInterval); // Ferma il cronometro
     isRunning = false; // Imposta il flag
     elapsedTime = 0; // Azzera il tempo
@@ -74,13 +79,14 @@ document.getElementById("reset").addEventListener("click", () => {
 });
 
 // EVENTO: Lap (registra tempo corrente)
-document.getElementById("lap").addEventListener("click", () => {
+lapButton.addEventListener("click", () => {
     if (!isRunning) return; // Non si può salvare un lap se è fermo
 
     const lapTime = elapsedTime; // Memorizza il tempo attuale
     laps.push(lapTime); // Aggiunge lap all'array dei laps (alla fine)
 
     const li = document.createElement("li"); // Crea nuovo <li>
+    li.classList.add("list-group-item"); // Aggiunge al <li> la classe di Bootstrap
     li.textContent = `Lap ${laps.length}: ${formatTime(lapTime)}`; // Testo formattato
     lapsList.appendChild(li); // Aggiunge alla lista nella pagina
 
@@ -95,7 +101,7 @@ function showTemporaryFeedback(message) {
     if (!feedbackDiv) {
         feedbackDiv = document.createElement("div");
         feedbackDiv.id = "feedback";
-        feedbackDiv.style.marginTop = "10px";
+        feedbackDiv.style.marginTop = "15px";
         feedbackDiv.style.color = "#708090";
         lapsList.parentNode.insertBefore(feedbackDiv, lapsList); // Inserisce sotto il cronometro
     }
